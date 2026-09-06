@@ -16,6 +16,26 @@ It is deliberately **not** a "build my app while I sleep" button. Every product 
 
 This skill orchestrates the **mattpocock-skills** plugin (`ask-matt`, `to-spec`, `to-tickets`, `implement`, `tdd`, `code-review`, `grilling`, `domain-modeling`). Those skills define the flow; this one defines how to run it with agents and a human in the loop. Install both — the skill assumes the plugin is there.
 
+## Side by side
+
+Nothing in the left column is replaced — this skill calls it.
+
+| | mattpocock skills | this layer on top |
+|---|---|---|
+| **Who writes the code** | You do, in your own session, `/clear` between tickets | Background executors, one per ticket; *coordinator* becomes a separate role |
+| **Working copy** | One; the work runs sequentially | A worktree per executor, including the one nominally on the target branch |
+| **Parallelism** | Not needed — there is nobody to parallelise | The frontier is recomputed after every merge; only tickets with no shared files run at once |
+| **Accepting work** | `code-review` inside `implement` — you are the author | The coordinator re-verifies the report's claims with its own commands, then sorts divergences into accepted / for the human / red line |
+| **Merging** | Ordinary branch work | Linear only: `rebase`, then `--ff-only`; a base that moved is replayed with `rebase --onto` from a hash recorded when it moved |
+| **A dropped agent** | No such case | Its uncommitted files are value: listed in the handoff and handed to the next agent as "continue this draft, do not rewrite it" |
+| **Handoff** | `/handoff` — a manual compaction of the current conversation into the OS temp directory, invoked by you | A document in the repository, written *before* the first executor and updated after every merge; a hook nags when it falls behind the code |
+| **The interview** | `grill-with-docs` — the grilling mechanism, `CONTEXT.md`, ADRs | The shape of a round with a live human: one recommendation per question, "ok" accepts the round, taste answered against a mockup, facts fetched before asking |
+| **Operational rules** | Not its layer | Permission granted once per class of action, credentials never in chat, exit codes read alone, cross-repository work staged through a scratchpad |
+
+Working alone inside a single session? Matt's set is enough, and cheaper. This layer pays off when the milestone outlives one session and the implementing is handed to agents.
+
+What is **not** here stays with Matt's set: triaging incoming issues, bug diagnosis, prototypes, install wizards, merge conflicts, and `wayfinder` for efforts too foggy to scope.
+
 ## The pipeline
 
 | # | Step | Done when |
@@ -39,7 +59,7 @@ Every item below is a scar, not a preference:
 - **The coordinator fetches facts before asking.** Anything readable in files, code or docs is read first; primary-source research runs as a background agent while the rounds continue.
 - **Taste is settled by looking.** Layout, palette and tone are answered against a real mockup in the project's real tokens, with a difference table in numbers. Taste questions are never delegated to a subagent — a subagent cannot show you a picture.
 - **A worktree per executor**, including the one who nominally "works on the main branch". This kills three problems at once: mixed-up staging, races over the same files, and agents killing each other's processes.
-- **A living handoff document**, updated after every merge — plus a hook that nags when it falls behind the code. Model limits and closed terminals arrive without warning; a fresh handoff makes them free.
+- **A living handoff document.** Matt's set has `/handoff`; that one compacts the current conversation into a temp file when you ask it to. This is a different genre — a document in the repository, written before the first executor and updated after every merge, with a hook that nags when it goes stale. Model limits and closed terminals arrive without warning; a fresh handoff makes them free.
 - **Linear merges only** (`rebase` then `--ff-only`), and when an executor's base moved underneath it, `rebase --onto <target> <old blocker tip> <branch>` — with the old hash recorded in the handoff at the moment it moved, not hunted for in the reflog later.
 - **A dropped executor's uncommitted files are value, not garbage.** They get listed in the handoff and handed to the next agent with "continue this draft, do not rewrite it".
 - **Exit codes are read alone.** A command whose exit code *is* the answer runs without a `; echo; tail` after it — otherwise the shell reports the tail's success and a failed release reads as green. That one happened.
