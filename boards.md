@@ -52,7 +52,8 @@
   проекта (стабильные `id` фигур с приставкой `kb<номер>-`): повтор обновляет раздел, лишнее помечается
   `isDeleted`, после записи число живых фигур сверяется; «Готово» — последние десять, остальные строкой;
 - хук `board-sync-hook.sh` (PostToolUse на Bash в `~/.claude/settings.json`): после `gh issue
-  create/close/reopen/edit` и `gh project item-…` через 15 с в фоне `--all`, журнал — `~/.cache/board-sync.log`.
+  create/close/reopen/edit` и `gh project item-add/create/edit/delete/archive` в фоне `--all` через 15 с и ещё раз
+  через минуту (новую карточку GitHub отдаёт в списке с задержкой), журнал — `~/.cache/board-sync.log`.
   Правка статуса руками на сайте GitHub хук не будит — `board-sync.py --all` при следующем обновлении досок.
 - Новый проект: доска GitHub Projects (статусы переименовать с сохранением `id` — встроенное «закрыт →
   Готово» продолжит работать; вид «Канбан» — мутацией `createProjectV2View`, `layout: BOARD_LAYOUT`) →
