@@ -47,9 +47,10 @@ What is **not** here stays with Matt's set: triaging incoming issues, bug diagno
 | 5 | Tickets are tracing slices | Published blockers-first with native tracker dependencies |
 | 6 | Handoff document exists | Written **before** the first executor, not before the context runs out |
 | 7 | Executors implement | One fresh agent per ticket, each in its own worktree |
-| 8 | Accept and merge | Claims re-verified on the branch, merged fast-forward only, ticket closed with evidence |
-| 9 | Human gates | Taste content approved in full; manual acceptance through the same door a user walks through |
-| 10 | Trace | What was decided, what was refused, what permissions were granted |
+| 8 | Accept and merge | The repository's WHOLE check set re-run by hand on the target branch after merging, merged fast-forward only, ticket closed with evidence |
+| 9 | Human gates | Taste content approved in full; manual acceptance through the same door a user walks through. Nothing ships before it: agents cannot disprove an assumption about the environment they all share |
+| 10 | Release | Order between coupled parts written down in advance; a snapshot taken before anything irreversible, its path in the handoff |
+| 11 | Trace | What was decided, what was refused, what permissions were granted; each lesson walked back through the product |
 
 ## What it adds over just asking an agent to build things
 
