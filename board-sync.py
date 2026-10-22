@@ -14,6 +14,8 @@ EXCALIDASH_URL (по умолчанию https://draw.jedicoder.store). Нуже�
   board-sync.py <owner/repo>        одна доска
   board-sync.py --all               все из настройки
   board-sync.py <owner/repo> --dry  посчитать и показать, ничего не писать
+  board-sync.py <owner/repo> --empty  разрешить пустой канбан: без флага 0 задач при карточках на доске —
+                                      сбой ответа GitHub, раздел не трогается (урок 22.10.2026)
 """
 import json, os, random, subprocess, sys, time, urllib.request
 from datetime import datetime, timezone, timedelta
@@ -39,11 +41,17 @@ def die(msg):
 
 
 def gh_items(owner, project):
-    out = subprocess.run(['gh', 'project', 'item-list', str(project), '--owner', owner, '--format', 'json', '--limit', '1000'],
-                         capture_output=True, text=True)
-    if out.returncode:
-        die('gh project item-list: ' + out.stderr.strip()[:300])
-    return json.loads(out.stdout)['items']
+    # GitHub изредка отдаёт пустой список с кодом 0 (22.10.2026 — дважды за час): пустой ответ переспрашиваем
+    for attempt in range(3):
+        out = subprocess.run(['gh', 'project', 'item-list', str(project), '--owner', owner, '--format', 'json', '--limit', '1000'],
+                             capture_output=True, text=True)
+        if out.returncode:
+            die('gh project item-list: ' + out.stderr.strip()[:300])
+        items = json.loads(out.stdout)['items']
+        if items:
+            return items
+        time.sleep(5)
+    return items
 
 
 def gh_title(owner, project):
@@ -154,7 +162,7 @@ def next_indexes(existing):
         yield head + digits
 
 
-def sync(repo, cfg, dry=False):
+def sync(repo, cfg, dry=False, allow_empty=False):
     owner, project, board = cfg['owner'], cfg['project'], cfg['board']
     prefix = f'kb{project}'
     items = gh_items(owner, project)
@@ -173,6 +181,11 @@ def sync(repo, cfg, dry=False):
         ox = min((e['x'] for e in alive), default=0)
         oy = max((e['y'] + e.get('height', 0) for e in alive), default=-240) + 240
     want = desired(items, prefix, ox, oy, title, url)
+    live = [e for e in mine.values() if not e.get('isDeleted')]
+    if not items and len(live) > len(want) and not allow_empty:
+        print(f'board-sync: {repo}: GitHub отдал 0 задач, а на доске есть карточки — похоже на сбой ответа, раздел не трогаю '
+              '(пустой канбан — с --empty)', file=sys.stderr)
+        return
     idx = next_indexes([e.get('index') for e in els])
     out, changed, added, removed = list(others), 0, 0, 0
     keys = ('type', 'x', 'y', 'width', 'height', 'strokeColor', 'backgroundColor', 'text', 'fontSize')
@@ -217,7 +230,7 @@ def main(argv):
     for repo in repos:
         if repo not in cfg:
             die(f'{repo}: нет в {CONFIG}')
-        sync(repo, cfg[repo], dry)
+        sync(repo, cfg[repo], dry, '--empty' in argv)
 
 
 if __name__ == '__main__':
