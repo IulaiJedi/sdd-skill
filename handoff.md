@@ -15,7 +15,7 @@
 # Передача: <тема>, <дата>
 
 Процесс — скилл `~/.claude/skills/sdd/`. Спека — issue #N, тикеты #A–#B,
-словарь `CONTEXT.md`, решения `docs/adr/`, факты `docs/research/`.
+словарь `GLOSSARY.md`, решения `docs/adr/`, факты `docs/research/`.
 
 ## Где мы
 

@@ -29,7 +29,7 @@ Nothing in the left column is replaced — this skill calls it.
 | **Merging** | Ordinary branch work | Linear only: `rebase`, then `--ff-only`; a base that moved is replayed with `rebase --onto` from a hash recorded when it moved |
 | **A dropped agent** | No such case | Its uncommitted files are value: listed in the handoff and handed to the next agent as "continue this draft, do not rewrite it" |
 | **Handoff** | `/handoff` — a manual compaction of the current conversation into the OS temp directory, invoked by you | A document in the repository, written *before* the first executor and updated after every merge; a hook nags when it falls behind the code |
-| **The interview** | `grill-with-docs` — the grilling mechanism, `CONTEXT.md`, ADRs | The shape of a round with a live human: one recommendation per question, "ok" accepts the round, taste answered against a mockup, facts fetched before asking |
+| **The interview** | `grill-with-docs` — the grilling mechanism, `GLOSSARY.md`, ADRs | The shape of a round with a live human: one recommendation per question, "ok" accepts the round, taste answered against a mockup, facts fetched before asking |
 | **Operational rules** | Not its layer | Permission granted once per class of action, credentials never in chat, exit codes read alone, cross-repository work staged through a scratchpad |
 
 Working alone inside a single session? Matt's set is enough, and cheaper. This layer pays off when the milestone outlives one session and the implementing is handed to agents.
@@ -41,7 +41,7 @@ What is **not** here stays with Matt's set: triaging incoming issues, bug diagno
 | # | Step | Done when |
 |---|---|---|
 | 1 | Repository is ready | `CLAUDE.md` and agent docs exist, every command in them actually runs |
-| 2 | Interview until the frontier is empty | No branch of the decision tree is assumed silently; terms in `CONTEXT.md`, decisions in ADRs |
+| 2 | Interview until the frontier is empty | No branch of the decision tree is assumed silently; terms in `GLOSSARY.md`, decisions in ADRs |
 | 3 | Seams agreed | The human has approved what gets automated tests and what can only be checked by hand |
 | 4 | Spec in the tracker | One issue, labelled, linking the glossary, ADRs, research reports and mockups |
 | 5 | Tickets are tracing slices | Published blockers-first with native tracker dependencies |
